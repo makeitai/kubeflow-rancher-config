@@ -35,5 +35,6 @@ Unable to attach or mount volumes: unmounted volumes=[istio-token], unattached v
 
 
 
-
-
+# Pipelines stop running: Failed calling webhook "inferenceservice.kfserving-webhook-server.pod-mutator" -- Not Tested in production enviroment
+kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io --all
+kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io --all
