@@ -1,6 +1,7 @@
 # kubeflow-rancher-config
 Working Kubernetes Config for Kubeflow v1.1 with Rancher 2.x. Below solution code is added to the kubeconfig file in rancher from Racher UI -> Click on Cluster -> Edit Cluster -> Kubernetes options location. Search for the respective kube-api and kube-controller. 
 
+You can Copy paste the kubeflow.yml but you need to rename the value YOURCLUSTERNAME to match the names of the cluster you created in Rancher UI. 
 
 # Solution
 The is configuration should resolve most of the errors except for AVX error caused by metadata-writer deployment as that is related to CPU. Old CPU does not support AVX read below for more information. 
