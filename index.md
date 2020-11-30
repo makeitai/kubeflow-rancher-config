@@ -1,37 +1,38 @@
-## Welcome to GitHub Pages
+# kubeflow-rancher-config
+Working Kubernetes Config for Kubeflow v1.1 with Rancher 2.x. Below solution code is added to the kubeconfig file in rancher from Racher UI -> Click on Cluster -> Edit Cluster -> Kubernetes options location. Search for the respective kube-api and kube-controller. 
 
-You can use the [editor on GitHub](https://github.com/makeitai/kubeflow-rancher-config/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+You can Copy paste the kubeflow.yml but you need to rename the value YOURCLUSTERNAME to match the names of the cluster you created in Rancher UI. 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+# Solution
+The is configuration should resolve most of the errors except for AVX error caused by metadata-writer deployment as that is related to CPU. Old CPU does not support AVX read below for more information. 
+    kube-api:
+      always_pull_images: false
+      extra_args:
+        service-account-issuer: kubernetes.default.svc
+        service-account-signing-key-file: /etc/kubernetes/ssl/kube-service-account-token-key.pem
+      pod_security_policy: false
+      service_node_port_range: 30000-32767
+    kube-controller:
+      extra_args:
+        cluster-signing-cert-file: /etc/kubernetes/ssl/kube-ca.pem
+        cluster-signing-key-file: /etc/kubernetes/ssl/kube-ca-key.pem
 
-### Markdown
+# Successful deployment sequence for kubeflow in Rancher 2.x
+Knative-Serving namespace deployment --> Istio-sytem namspace deployment --> Kubeflow namespace deployment
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Possible Errors
+# Kubeflow Illegal instruction (core dumped) this only happen for metadata-writer
+With this configuration metadata-writer pods will still fail if your CPU does not support AVX(Advanced Vector Execution). Deploying kubeflow on old CPU's that does not support AVX will result in this error. <br />
+To Verify AVX Support Run below command <br />
 
-```markdown
-Syntax highlighted code block
+```cat /proc/cpuinfo | grep avx ```
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
+# cache-deployer cache-server ml-pipeline ml-pipeline ml-pipeline-persistenceagent ml-pipeline-ui ml-pipeline-scheduledworkflow ml-pipeline-viewer-crd ml-pipeline-visulizationserver mysql istio-policy -- All these deployments will fails will below error. Some deployment will fail in istio-system namespace and kubeflow namespace also.  
+MountVolume.SetUp failed for volume "istio-token" : failed to fetch token: the API server does not have TokenRequest endpoints enabled
+containers with incomplete status: [istio-init]
+Unable to attach or mount volumes: unmounted volumes=[istio-token], unattached volumes=[sds-uds-path istio-token ml-pipeline-token-g5m62 istio-envoy]: timed out waiting for the condition
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/makeitai/kubeflow-rancher-config/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
